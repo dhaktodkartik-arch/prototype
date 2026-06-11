@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Srishti AI - Multi-Agent Consensus Arena</title>
+    <meta name="description" content="Srishti AI: Ask a question and multiple specialized AI agents debate, critique, and synthesize the ultimate answer in real time.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Marked.js (Markdown Parser) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Prism.js (Syntax Highlighting) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- AUTH SCREEN (shown when not logged in)         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="auth-screen" class="auth-screen hidden">
+        <div class="auth-bg-orbs">
+            <div class="auth-orb auth-orb-1"></div>
+            <div class="auth-orb auth-orb-2"></div>
+            <div class="auth-orb auth-orb-3"></div>
+        </div>
+
+        <div class="auth-card">
+            <!-- Brand -->
+            <div class="auth-brand">
+                <span class="logo-icon">✨</span>
+                <span class="auth-brand-name">Srishti <span class="accent-text">AI</span></span>
+            </div>
+            <p class="auth-tagline">The Multi-Agent Consensus Arena</p>
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button id="auth-tab-login" class="auth-tab active">Sign In</button>
+                <button id="auth-tab-signup" class="auth-tab">Create Account</button>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="auth-error" class="auth-error hidden"></div>
+
+            <!-- Login Form -->
+            <form id="auth-form-login" class="auth-form" autocomplete="on">
+                <div class="auth-field">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" class="auth-input">
+                </div>
+                <div class="auth-field">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" class="auth-input">
+                </div>
+                <button id="btn-login" type="submit" class="btn btn-primary auth-submit-btn">Sign In to Srishti AI</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="auth-form-signup" class="auth-form hidden" autocomplete="on">
+                <div class="auth-field">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Your Name" autocomplete="name" class="auth-input">
+                </div>
+                <div class="auth-field">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" class="auth-input">
+                </div>
+                <div class="auth-field">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password" class="auth-input">
+                </div>
+                <div class="auth-field">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Repeat your password" autocomplete="new-password" class="auth-input">
+                </div>
+                <button id="btn-signup" type="submit" class="btn btn-primary auth-submit-btn">Create My Account</button>
+            </form>
+
+            <!-- Demo Login -->
+            <div class="auth-divider"><span>or</span></div>
+            <button id="btn-demo-login" class="btn btn-secondary auth-demo-btn">
+                ⚡ Try Demo Account
+            </button>
+
+            <p class="auth-footer-note">Your data stays in your browser. No servers.</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- MAIN APP (shown when logged in)               -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="app-container-main" class="app-container hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Logo + User Profile -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">✨</span>
+                    <span class="logo-text">Srishti <span class="accent-text">AI</span></span>
+                </div>
+                <div class="version">v1.3.0</div>
+            </div>
+
+            <!-- User Profile Strip -->
+            <div class="user-profile-strip">
+                <div class="user-avatar-circle" id="user-avatar-initials">U</div>
+                <div class="user-info">
+                    <div class="user-display-name" id="user-display-name">User</div>
+                    <div class="user-display-email" id="user-display-email">user@email.com</div>
+                </div>
+                <button id="btn-logout" class="btn-icon logout-btn" title="Sign Out">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- API Configuration Button -->
+            <button id="btn-api-keys" class="btn btn-secondary api-settings-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                </svg>
+                API Credentials
+            </button>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Sidebar Tabs (Agents / History) -->
+            <div class="sidebar-tab-bar">
+                <button id="stab-agents" class="sidebar-tab active">Agents</button>
+                <button id="stab-history" class="sidebar-tab">History</button>
+            </div>
+
+            <!-- PANEL: Active Agents -->
+            <div id="panel-agents" class="sidebar-panel">
+                <div class="section-title-row">
+                    <h3>ACTIVE AGENTS</h3>
+                    <button id="btn-add-agent" class="btn-icon" title="Create Custom Agent">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="agents-list" class="agents-list"></div>
+            </div>
+
+            <!-- PANEL: Chat History -->
+            <div id="panel-history" class="sidebar-panel hidden">
+                <div class="section-title-row">
+                    <h3>CHAT HISTORY</h3>
+                    <button id="btn-clear-history" class="btn-icon danger-icon" title="Clear All History">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+                            <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="history-list" class="history-list">
+                    <div id="history-empty" class="history-empty">
+                        <p>No conversations yet.</p>
+                        <p>Start a debate to see history here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Debate Settings (always visible) -->
+            <div class="sidebar-section debate-config-section">
+                <h3>DEBATE SETTINGS</h3>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <span>Debate Rounds</span>
+                        <span id="rounds-val">2</span>
+                    </div>
+                    <input type="range" id="input-rounds" min="1" max="4" value="2" class="slider">
+                    <div class="setting-help">Critique passes before final synthesis.</div>
+                </div>
+                <div class="setting-item toggle-item">
+                    <div class="setting-label">
+                        <span>Force Simulation Mode</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-simulation">
+                        <span class="slider-round"></span>
+                    </label>
+                </div>
+                <div class="setting-help">Bypass API keys and run demo responses.</div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <p>Collaborative multi-agent consensus system.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Arena -->
+        <main class="main-arena">
+            <!-- Header -->
+            <header class="arena-header">
+                <div class="header-status">
+                    <span id="status-indicator" class="status-indicator warning"></span>
+                    <span id="status-text">Simulation Mode (No Keys Loaded)</span>
+                </div>
+                <div class="header-actions">
+                    <button id="btn-reset" class="btn btn-secondary btn-small">Reset Arena</button>
+                </div>
+            </header>
+
+            <!-- Workspace -->
+            <div class="workspace">
+                <!-- Idle View -->
+                <div id="idle-view" class="idle-view">
+                    <div class="hero-header animate-fade-in">
+                        <div class="glowing-orb"></div>
+                        <h1>Unlock the Power of <span class="gradient-text">Consensus AI</span></h1>
+                        <p>Ask a question or describe a complex problem. Multiple specialized agents running different AI models will brainstorm, cross-critique, and synthesise the ultimate solution.</p>
+                    </div>
+                    <div class="suggested-prompts animate-slide-up">
+                        <h3>SUGGESTED SCENARIOS</h3>
+                        <div class="presets-grid">
+                            <div class="preset-card" data-prompt="Create a robust, scalable backend database schema for an e-commerce shopping cart, detailing index choices and foreign keys.">
+                                <div class="preset-icon">💻</div>
+                                <h4>E-commerce Architecture</h4>
+                                <p>Architect a backend schema & optimization rules.</p>
+                            </div>
+                            <div class="preset-card" data-prompt="Draft a pitch strategy for an AI-powered home gardening startup. We need to define monetization plans, user validation loops, and combat churn.">
+                                <div class="preset-icon">🌱</div>
+                                <h4>Startup Strategy</h4>
+                                <p>Define business models and launch roadmaps.</p>
+                            </div>
+                            <div class="preset-card" data-prompt="Write a professional developer guide explaining how WebAssembly works inside modern browsers, including memory sharing risks and compilation stages.">
+                                <div class="preset-icon">📝</div>
+                                <h4>Technical Blogging</h4>
+                                <p>Draft educational documents with clear outlines.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active View -->
+                <div id="active-view" class="active-view hidden">
+                    <!-- SVG Network Graph -->
+                    <div class="graph-container">
+                        <div class="graph-title">COLLABORATIVE GRAPH</div>
+                        <svg id="network-graph" viewBox="0 0 800 220">
+                            <defs>
+                                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur stdDeviation="8" result="blur"/>
+                                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                </filter>
+                                <filter id="glow-light" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                </filter>
+                            </defs>
+                            <g id="graph-links"></g>
+                            <g id="graph-particles"></g>
+                            <g id="graph-nodes"></g>
+                        </svg>
+                    </div>
+
+                    <!-- Progress Stepper -->
+                    <div class="progress-bar-container">
+                        <div class="progress-step active" id="step-prompt">
+                            <div class="step-num">1</div>
+                            <div class="step-label">Prompt</div>
+                        </div>
+                        <div class="progress-line" id="line-1"></div>
+                        <div class="progress-step" id="step-brainstorm">
+                            <div class="step-num">2</div>
+                            <div class="step-label">Brainstorming</div>
+                        </div>
+                        <div class="progress-line" id="line-2"></div>
+                        <div class="progress-step" id="step-debate">
+                            <div class="step-num">3</div>
+                            <div class="step-label">Debate & Critique</div>
+                        </div>
+                        <div class="progress-line" id="line-3"></div>
+                        <div class="progress-step" id="step-synthesis">
+                            <div class="step-num">4</div>
+                            <div class="step-label">Final Synthesis</div>
+                        </div>
+                    </div>
+
+                    <!-- Arena Grid: Discussion + Final -->
+                    <div class="arena-grid">
+                        <div class="discussion-panel">
+                            <h3 class="panel-header">Agent Dialogue & Debate Logs</h3>
+                            <div id="discussion-feed" class="discussion-feed"></div>
+                        </div>
+                        <div class="final-panel">
+                            <div class="final-header-row">
+                                <h3>🏆 FINAL CONSENSUS VERDICT</h3>
+                                <div class="final-actions hidden" id="final-actions-buttons">
+                                    <button id="btn-copy" class="btn btn-secondary btn-small">Copy</button>
+                                    <button id="btn-download" class="btn btn-secondary btn-small">Download</button>
+                                </div>
+                            </div>
+                            <div id="final-output-card" class="final-output-card empty">
+                                <div class="output-placeholder">
+                                    <div class="spinner-pulse hidden" id="synth-spinner"></div>
+                                    <p id="final-placeholder-text">Waiting for agents to conclude their discussion...</p>
+                                </div>
+                                <div id="markdown-container" class="markdown-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Footer -->
+            <footer class="input-panel">
+                <div class="input-container">
+                    <!-- Mic Button -->
+                    <button id="btn-mic" class="btn-mic" title="Voice Input (Speech to Text)">
+                        <svg id="mic-icon-default" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                        <svg id="mic-icon-active" class="hidden mic-active-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+                            <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+
+                    <textarea id="chat-input" placeholder="Ask your question or describe your problem... (or click 🎤 to speak)" rows="1"></textarea>
+
+                    <div class="input-actions">
+                        <button id="btn-send" class="btn btn-primary" disabled>
+                            <span>Synthesize</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Voice status bar -->
+                <div id="voice-status-bar" class="voice-status-bar hidden">
+                    <span class="voice-pulse-dot"></span>
+                    <span id="voice-status-text">Listening... speak now</span>
+                    <button id="btn-stop-voice" class="btn-voice-stop">Stop</button>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- MODAL: API Credentials                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="modal-api-keys" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>API Credentials Settings</h2>
+                <button class="modal-close btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">API keys are stored strictly inside your browser's local storage. Leave blank to run in simulation mode.</p>
+                <div class="api-fields-grid">
+                    <div class="api-field-card" style="border-left-color: var(--color-gemini)">
+                        <div class="provider-label"><span class="provider-dot" style="background-color: var(--color-gemini)"></span><strong>Google Gemini</strong></div>
+                        <input type="password" id="key-gemini" placeholder="AIzaSy..." class="form-input key-input">
+                        <a href="https://aistudio.google.com/" target="_blank" class="key-link">Get free key → Google AI Studio</a>
+                    </div>
+                    <div class="api-field-card" style="border-left-color: var(--color-openrouter)">
+                        <div class="provider-label"><span class="provider-dot" style="background-color: var(--color-openrouter)"></span><strong>OpenRouter (Free Models)</strong></div>
+                        <input type="password" id="key-openrouter" placeholder="sk-or-v1-..." class="form-input key-input">
+                        <a href="https://openrouter.ai/keys" target="_blank" class="key-link">Get key → openrouter.ai</a>
+                    </div>
+                    <div class="api-field-card" style="border-left-color: var(--color-chatgpt)">
+                        <div class="provider-label"><span class="provider-dot" style="background-color: var(--color-chatgpt)"></span><strong>OpenAI (ChatGPT)</strong></div>
+                        <input type="password" id="key-openai" placeholder="sk-..." class="form-input key-input">
+                        <a href="https://platform.openai.com/api-keys" target="_blank" class="key-link">Get key → OpenAI Platform</a>
+                    </div>
+                    <div class="api-field-card" style="border-left-color: var(--color-claude)">
+                        <div class="provider-label"><span class="provider-dot" style="background-color: var(--color-claude)"></span><strong>Anthropic (Claude)</strong></div>
+                        <input type="password" id="key-anthropic" placeholder="sk-ant-..." class="form-input key-input">
+                        <a href="https://console.anthropic.com/" target="_blank" class="key-link">Get key → Anthropic Console</a>
+                    </div>
+                    <div class="api-field-card" style="border-left-color: var(--color-grok)">
+                        <div class="provider-label"><span class="provider-dot" style="background-color: #fff"></span><strong>xAI Grok</strong></div>
+                        <input type="password" id="key-grok" placeholder="xai-..." class="form-input key-input">
+                        <a href="https://console.x.ai/" target="_blank" class="key-link">Get key → console.x.ai</a>
+                    </div>
+                    <div class="api-field-card" style="border-left-color: var(--color-perplexity)">
+                        <div class="provider-label"><span class="provider-dot" style="background-color: var(--color-perplexity)"></span><strong>Perplexity AI</strong></div>
+                        <input type="password" id="key-perplexity" placeholder="pplx-..." class="form-input key-input">
+                        <a href="https://www.perplexity.ai/settings/api" target="_blank" class="key-link">Get key → Perplexity Settings</a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-close-modal">Cancel</button>
+                <button id="btn-save-keys" class="btn btn-primary">Save Credentials</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- MODAL: Agent Customization                    -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="modal-agent-edit" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="agent-modal-title">Configure Agent</h2>
+                <button class="modal-close btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="agent-form">
+                    <input type="hidden" id="edit-agent-id">
+                    <div class="form-row split">
+                        <div class="form-group">
+                            <label for="edit-agent-name">Agent Name</label>
+                            <input type="text" id="edit-agent-name" required class="form-input">
+                        </div>
+                        <div class="form-group avatar-group">
+                            <label for="edit-agent-avatar">Avatar</label>
+                            <input type="text" id="edit-agent-avatar" required maxlength="2" class="form-input text-center">
+                        </div>
+                    </div>
+                    <div class="form-row split" style="grid-template-columns: 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="edit-agent-provider">AI Provider</label>
+                            <select id="edit-agent-provider" class="form-input"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-agent-model">AI Model</label>
+                            <select id="edit-agent-model" class="form-input"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-agent-prompt">System Persona Prompt</label>
+                        <textarea id="edit-agent-prompt" rows="5" required class="form-input textarea-prompt"></textarea>
+                        <div class="setting-help">Instruct the agent on what perspective to take.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-delete-agent" class="btn btn-danger hidden">Delete Agent</button>
+                <div style="flex-grow: 1;"></div>
+                <button class="btn btn-secondary btn-close-modal">Cancel</button>
+                <button id="btn-save-agent" class="btn btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (order matters) -->
+    <script src="agents.js"></script>
+    <script src="api.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
